@@ -1,53 +1,41 @@
 import { Constructable } from './types/constructable.type';
-import { DependencyRef } from './types/dependency.type';
+import { DependencyConfig, DependencyRef } from './types/dependency.type';
 
 const SCOPE_CONTEXT_ROOT = 'root';
 
-type DependencyConfig = {
-  dependencyKey?: string;
-  index: number;
-  parentKey: string;
-};
-
 class Injectables {
-  private _map: Map<string, Function> = new Map();
+  private _catalog: DependencyRef[] = [];
 
-  public add(key: string, injectable: Function): void {
-    if (!this.has(key)) {
-      this._map.set(key, injectable);
+  public add(injectable: Function): void {
+    if (!this.has(injectable)) {
+      this._catalog.push(injectable);
     }
   }
 
-  public get(key: string): Function | undefined {
-    return this._map.get(key);
-  }
-
-  public has(key: string): boolean {
-    return this._map.has(key);
+  public has(injectable: Function): boolean {
+    return this._catalog.includes(injectable);
   }
 }
 
 class Dependencies {
-  private _map: Map<string, string[]> = new Map();
+  private _map: Map<DependencyRef, DependencyRef[]> = new Map();
 
   public add(config: DependencyConfig): void {
-    const { parentKey, index, dependencyKey } = config;
+    const { parent, index, dependency } = config;
 
-    if (dependencyKey) {
-      const dependencies = this.get(parentKey);
+    const dependencies = this.get(parent);
 
-      dependencies[index] = dependencyKey;
-    }
+    dependencies[index] = dependency;
   }
 
-  public get(parentKey: string): string[] {
+  public get(parentKey: DependencyRef): DependencyRef[] {
     const dependenciesCurrent = this._map.get(parentKey);
 
     if (dependenciesCurrent) {
       return dependenciesCurrent;
     }
 
-    const dependencies: string[] = [];
+    const dependencies: DependencyRef[] = [];
 
     this._map.set(parentKey, dependencies);
 
@@ -56,14 +44,14 @@ class Dependencies {
 }
 
 class Instances {
-  private _map: Map<string, unknown> = new Map();
+  private _map: Map<DependencyRef, unknown> = new Map();
 
-  public add(injectableKey: string, value: unknown): void {
-    this._map.set(injectableKey, value);
+  public add(dependency: DependencyRef, value: unknown): void {
+    this._map.set(dependency, value);
   }
 
-  public get(injectableKey: string): any {
-    return this._map.get(injectableKey);
+  public get(dependency: DependencyRef): any {
+    return this._map.get(dependency);
   }
 }
 
@@ -74,30 +62,26 @@ class ScopeContext {
 
   private _dependencies = new Dependencies();
 
-  public addInjectable(key: string, injectable: Function): void {
-    this._injectables.add(key, injectable);
+  public addInjectable(injectable: DependencyRef): void {
+    this._injectables.add(injectable);
   }
 
   public addDependency(config: DependencyConfig): void {
     this._dependencies.add(config);
   }
 
-  public getInstance<T = unknown>(dependencyRef: DependencyRef<T>): T {
-    const ref = this._getDependencyRefKey(dependencyRef);
-
+  public getInstance<T = unknown>(ref: DependencyRef<T>): T {
     const scopeInstance = this._instances.get(ref);
 
     if (scopeInstance) {
       return scopeInstance as T;
     }
 
-    const scopeInjectable = this._injectables.get(ref);
-
-    if (!scopeInjectable) {
-      throw Error(`Class ${ref} is not found in the Injectables catalog`);
+    if (!this._injectables.has(ref)) {
+      throw Error(`Class ${ref.name} is not found in the Injectables catalog`);
     }
 
-    const scopeConstructor = scopeInjectable as unknown as Constructable<T>;
+    const scopeConstructor = ref as unknown as Constructable<T>;
     const scopeDependencies = this._dependencies.get(ref);
 
     const scopeParams: unknown[] =
@@ -117,20 +101,15 @@ class ScopeContext {
 
     return injectableInstance;
   }
-
-  private _getDependencyRefKey<T>(ref: DependencyRef<T>): string {
-    return typeof ref === 'string' ? ref : ref.name;
-  }
 }
 
 const SCOPE_CONTEXTS = new Map<string, ScopeContext>();
 
 export function createInjectable(
-  key: string,
-  injectable: Function,
+  injectable: DependencyRef,
   scopeKey?: string
 ): void {
-  getScopeContext(scopeKey).addInjectable(key, injectable);
+  getScopeContext(scopeKey).addInjectable(injectable);
 }
 
 export function createDependency(
