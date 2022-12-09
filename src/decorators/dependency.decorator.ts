@@ -1,16 +1,19 @@
 import { createDependency } from '../factory';
-import { DependencyType } from '../types/dependency.type';
+import { InjectableRef } from '../types';
 
-export function Dependency(type: DependencyType): ParameterDecorator {
+export function Dependency(target: InjectableRef): Function;
+export function Dependency(
+  target: InjectableRef,
+  scopeKey?: string
+): ParameterDecorator {
   return (parent, _key, index) => {
-    console.log("Dependency:", type.target);
     createDependency(
       {
-        dependencyKey: type.key || type.target?.name,
+        dependency: target,
         index,
-        parentKey: (parent as Function).name
+        parent: parent as Function
       },
-      type.scopeKey
+      scopeKey
     );
   };
 }
