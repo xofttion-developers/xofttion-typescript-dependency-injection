@@ -1,12 +1,7 @@
-import { Constructable } from './constructable.type';
-
-export type DependencyRef<T = unknown> =
-  | Function
-  | Constructable<T>
-  | CallableFunction;
+import { InjectableRef } from './injectable.type';
 
 export type DependencyConfig = {
-  dependency: DependencyRef;
+  dependency: InjectableRef;
   index: number;
-  parent: DependencyRef;
+  parent: InjectableRef;
 };

@@ -1,6 +1,6 @@
 import { InjectableFactory } from './factory';
 
-export { Dependency } from './decorators/dependency.decorator';
-export { Injectable } from './decorators/injectable.decorator';
+export { Dependency, Injectable } from './decorators';
+export { createDependency, createInjectable } from './factory';
 
 export default InjectableFactory;

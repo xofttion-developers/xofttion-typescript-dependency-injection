@@ -1,9 +1,9 @@
 import { createDependency } from '../factory';
-import { DependencyRef } from '../types/dependency.type';
+import { InjectableRef } from '../types';
 
-export function Dependency(target: DependencyRef): Function;
+export function Dependency(target: InjectableRef): Function;
 export function Dependency(
-  target: DependencyRef,
+  target: InjectableRef,
   scopeKey?: string
 ): ParameterDecorator {
   return (parent, _key, index) => {
