@@ -8,7 +8,7 @@
     "importHelpers": true,
     "jsx": "react",
     "lib": ["dom", "es2020"],
-    "module": "commonjs",
+    "module": "es2020",
     "moduleResolution": "node",
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
@@ -22,11 +22,10 @@
     "target": "es2020",
     "typeRoots": ["node_modules/@types/**/*.d.ts"]
   },
-  "exclude": ["node_modules"],
   "include": ["src"],
   "ts-node": {
     "compilerOptions": {
-      "module": "commonjs"
+      "module": "es2020"
     },
     "files": true
   }
