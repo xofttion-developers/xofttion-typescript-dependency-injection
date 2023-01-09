@@ -1,50 +1,60 @@
-import { DependencyStore, InjectableStore, InstanceStore } from './stores';
-import { Constructable, DependencyConfig, InjectableRef } from './types';
+import { Dependencies, InjectableStore, InjectStore, InstanceStore } from './stores';
+import { Constructable, InjectableRef, InjectConfig, InjectType } from './types';
 
 export class ScopeContext {
-  private _injectableStore = new InjectableStore();
+  private _injectables = new InjectableStore();
 
-  private _instanceStore = new InstanceStore();
+  private _injects = new InjectStore();
 
-  private _dependencyStore = new DependencyStore();
+  private _instances = new InstanceStore();
 
   public addInjectable(injectable: InjectableRef): void {
-    this._injectableStore.add(injectable);
+    this._injectables.add(injectable);
   }
 
-  public addDependency(config: DependencyConfig): void {
-    this._dependencyStore.add(config);
+  public addInject(config: InjectConfig): void {
+    this._injects.add(config);
   }
 
   public getInstance<T = unknown>(injectable: InjectableRef<T>): T {
-    const scopeInstance = this._instanceStore.get(injectable);
+    const instanceScope = this._instances.get(injectable);
 
-    if (scopeInstance) {
-      return scopeInstance as T;
+    if (instanceScope) {
+      return instanceScope as T;
     }
 
-    if (!this._injectableStore.has(injectable)) {
-      throw Error(`Class ${injectable.name} is not found in the Injectables catalog`);
+    if (!this._injectables.has(injectable)) {
+      throw Error(`Class ${injectable} is not found in the Injectables catalog`);
     }
 
-    const ScopeConstructor = injectable as unknown as Constructable<T>;
-    const scopeDependencies = this._dependencyStore.get(injectable);
+    const ConstructorScope = injectable as unknown as Constructable<T>;
+    const injectsScope = this._injects.get(injectable);
 
-    const scopeParams: unknown[] =
-      (Reflect as any)?.getMetadata('design:paramtypes', ScopeConstructor) || [];
+    const paramsScope: unknown[] =
+      (Reflect as any)?.getMetadata('design:paramtypes', ConstructorScope) || [];
 
-    const paramsConstructor = scopeParams.map((param, index) => {
-      if (scopeDependencies && scopeDependencies[index]) {
-        return this.getInstance(scopeDependencies[index]);
+    const params = paramsScope.map((param, index) => {
+      if (injectsScope[index]) {
+        const injectableRef = this.getDependency(injectsScope[index]);
+
+        if (injectableRef) {
+          return this.getInstance(injectableRef);
+        }
       }
 
       return this.getInstance(param as CallableFunction);
     });
 
-    const injectableInstance = new ScopeConstructor(...paramsConstructor);
+    const injectableScope = new ConstructorScope(...params);
 
-    this._instanceStore.add(injectable, injectableInstance);
+    this._instances.add(injectable, injectableScope);
 
-    return injectableInstance;
+    return injectableScope;
+  }
+
+  private getDependency(inject: InjectType): InjectableRef | undefined {
+    return typeof inject === 'string'
+      ? Dependencies.get(inject)
+      : (inject as InjectableRef);
   }
 }
