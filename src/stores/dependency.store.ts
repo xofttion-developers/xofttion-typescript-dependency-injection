@@ -1,27 +1,15 @@
-import { DependencyConfig, InjectableRef } from '../types';
+import { InjectableRef } from '../types';
 
-export class DependencyStore {
-  private _map: Map<InjectableRef, InjectableRef[]> = new Map();
+class DependencyStore {
+  private _dependencies: Map<string, InjectableRef> = new Map();
 
-  public add(config: DependencyConfig): void {
-    const { parent, index, dependency } = config;
-
-    const dependencies = this.get(parent);
-
-    dependencies[index] = dependency;
+  public add(key: string, ref: InjectableRef): void {
+    this._dependencies.set(key, ref);
   }
 
-  public get(parentKey: InjectableRef): InjectableRef[] {
-    const dependenciesCurrent = this._map.get(parentKey);
-
-    if (dependenciesCurrent) {
-      return dependenciesCurrent;
-    }
-
-    const dependencies: InjectableRef[] = [];
-
-    this._map.set(parentKey, dependencies);
-
-    return dependencies;
+  public get(key: string): InjectableRef | undefined {
+    return this._dependencies.get(key);
   }
 }
+
+export const Dependencies = new DependencyStore();

@@ -1,15 +1,15 @@
-import { createDependency } from '../factory';
+import { createInject } from '../factory';
 import { InjectableRef } from '../types';
 
-export function Dependency(target: InjectableRef): Function;
-export function Dependency(
-  target: InjectableRef,
+export function Inject(target: InjectableRef | string): Function;
+export function Inject(
+  target: InjectableRef | string,
   scopeKey?: string
 ): ParameterDecorator {
   return (parent, _key, index) => {
-    createDependency(
+    createInject(
       {
-        dependency: target,
+        target,
         index,
         parent: parent as Function
       },
