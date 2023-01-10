@@ -6,4 +6,4 @@ export type InjectConfig = {
   parent: InjectableRef;
 };
 
-export type InjectType = InjectableRef | string;
+export type InjectType<T = unknown> = InjectableRef<T> | string;
