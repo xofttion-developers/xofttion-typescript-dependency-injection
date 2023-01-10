@@ -1,7 +1,8 @@
 import { ScopeContext } from './scope-context';
-import { InjectConfig, InjectableRef } from './types';
+import { InjectConfig, InjectableRef, DependencyConfig } from './types';
 
 const contexts = new Map<string, ScopeContext>();
+
 const SCOPE_CONTEXT_ROOT = 'root';
 
 export function createInjectable(
@@ -15,11 +16,19 @@ export function createInject(inject: InjectConfig, scopeKey?: string): void {
   getScopeContext(scopeKey).addInject(inject);
 }
 
+export function createDependency(
+  injectable: InjectableRef,
+  dependency: DependencyConfig,
+  scopeKey?: string
+): void {
+  getScopeContext(scopeKey).addDependency(injectable, dependency);
+}
+
 export function InjectableFactory<T = unknown>(
   ref: InjectableRef<T>,
   scopeKey?: string
 ): T {
-  return getScopeContext(scopeKey).getInstance(ref);
+  return getScopeContext(scopeKey).createInjectable(ref);
 }
 
 function getScopeContext(scopeKey?: string): ScopeContext {

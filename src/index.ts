@@ -1,7 +1,8 @@
 import { InjectableFactory } from './factory';
 
 export { Inject, Injectable } from './decorators';
-export { createInject, createInjectable } from './factory';
-export { Dependencies } from './stores';
+export { createDependency, createInject, createInjectable } from './factory';
+export { DependenciesMap } from './stores';
+export { DependencyJson } from './types';
 
 export default InjectableFactory;
