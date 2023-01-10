@@ -4,6 +4,12 @@ export type InjectConfig = {
   target: InjectableRef | string;
   index: number;
   parent: InjectableRef;
+  singleton: boolean;
 };
 
-export type InjectType<T = unknown> = InjectableRef<T> | string;
+export type InjectLocatorRef = {
+  name: string;
+  use: InjectableRef;
+};
+
+export type InjectRef<T = unknown> = InjectableRef<T> | string;

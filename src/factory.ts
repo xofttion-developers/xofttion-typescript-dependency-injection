@@ -1,48 +1,40 @@
-import { ScopeContext } from './scope-context';
-import { InjectConfig, InjectableRef, DependencyConfig } from './types';
+import { ScopeContainer } from './scope-container';
+import { InjectConfig, InjectableRef, InjectableConfig } from './types';
 
-const contexts = new Map<string, ScopeContext>();
+const containers = new Map<string, ScopeContainer>();
 
-const SCOPE_CONTEXT_ROOT = 'root';
+const SCOPE_CONTAINER_ROOT = 'root';
 
 export function createInjectable(
-  injectable: InjectableRef,
+  injectable: InjectableConfig,
   scopeKey?: string
 ): void {
-  getScopeContext(scopeKey).addInjectable(injectable);
+  getContainer(scopeKey).addInjectable(injectable);
 }
 
 export function createInject(inject: InjectConfig, scopeKey?: string): void {
-  getScopeContext(scopeKey).addInject(inject);
+  getContainer(scopeKey).addInject(inject);
 }
 
-export function createDependency(
-  injectable: InjectableRef,
-  dependency: DependencyConfig,
-  scopeKey?: string
-): void {
-  getScopeContext(scopeKey).addDependency(injectable, dependency);
-}
-
-export function InjectableFactory<T = unknown>(
-  ref: InjectableRef<T>,
+export function InjectionFactory<T = unknown>(
+  injectable: InjectableRef<T>,
   scopeKey?: string
 ): T {
-  return getScopeContext(scopeKey).createInjectable(ref);
+  return getContainer(scopeKey).createInjectable(injectable);
 }
 
-function getScopeContext(scopeKey?: string): ScopeContext {
-  const scopeFinal = scopeKey || SCOPE_CONTEXT_ROOT;
+function getContainer(scopeKey?: string): ScopeContainer {
+  const scope = scopeKey || SCOPE_CONTAINER_ROOT;
 
-  const contextCurrent = contexts.get(scopeFinal);
+  const currentContainer = containers.get(scope);
 
-  if (contextCurrent) {
-    return contextCurrent;
+  if (currentContainer) {
+    return currentContainer;
   }
 
-  const context = new ScopeContext();
+  const container = new ScopeContainer();
 
-  contexts.set(scopeFinal, context);
+  containers.set(scope, container);
 
-  return context;
+  return container;
 }
