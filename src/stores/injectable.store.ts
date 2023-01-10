@@ -1,15 +1,13 @@
-import { InjectableRef } from '../types';
+import { InjectableConfig, InjectableRef } from '../types';
 
 export class InjectableStore {
-  private _catalog: InjectableRef[] = [];
+  private _collection: Map<InjectableRef, InjectableConfig> = new Map();
 
-  public add(injectable: InjectableRef): void {
-    if (!this.has(injectable)) {
-      this._catalog.push(injectable);
-    }
+  public add(config: InjectableConfig): void {
+    this._collection.set(config.target, config);
   }
 
-  public has(injectable: InjectableRef): boolean {
-    return this._catalog.includes(injectable);
+  public get(injectable: InjectableRef): InjectableConfig | undefined {
+    return this._collection.get(injectable);
   }
 }
