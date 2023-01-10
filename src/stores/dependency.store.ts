@@ -3,9 +3,9 @@ import { DependencyConfig, DependencyJson, InjectableRef } from '../types';
 class DependencyMapStore {
   private _dependencies: Map<string, InjectableRef> = new Map();
 
-  public set(dependencies: DependencyJson): void {
-    Object.keys(dependencies).forEach((key) => {
-      this.add(key, dependencies[key]);
+  public set(dependencies: DependencyJson[]): void {
+    dependencies.forEach(({ name, use }) => {
+      this._dependencies.set(name, use);
     });
   }
 
@@ -13,8 +13,14 @@ class DependencyMapStore {
     return this._dependencies.get(key);
   }
 
-  public add(key: string, ref: InjectableRef): void {
-    this._dependencies.set(key, ref);
+  public add(dependency: string | DependencyJson, ref?: InjectableRef): void {
+    if (typeof dependency !== 'string') {
+      const { name, use } = dependency as DependencyJson;
+
+      this._dependencies.set(name, use);
+    } else if (ref) {
+      this._dependencies.set(dependency, ref);
+    }
   }
 }
 
