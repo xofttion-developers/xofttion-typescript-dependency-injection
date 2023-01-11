@@ -49,7 +49,7 @@ export class ScopeContainer {
       ConstructorObject
     );
 
-    const params = paramsRef.map((paramRef, index) => {
+    const params = paramsRef?.map((paramRef, index) => {
       const injectConfig = injectsRef[index];
 
       if (!injectConfig) {
@@ -69,7 +69,7 @@ export class ScopeContainer {
         : this._createObject(injectRef);
     });
 
-    return new ConstructorObject(...params);
+    return new ConstructorObject(...(params || []));
   }
 
   private _getSingleton<T = unknown>(ref: InjectableRef<T>): T {
@@ -85,8 +85,6 @@ export class ScopeContainer {
   }
 
   private _getInjectableRef(ref: InjectRef): InjectableRef | undefined {
-    return typeof ref === 'string'
-      ? InjectLocator.get(ref)
-      : (ref as InjectableRef);
+    return typeof ref === 'string' ? InjectLocator.get(ref) : (ref as InjectableRef);
   }
 }
