@@ -1,25 +1,25 @@
 import { InjectConfig, InjectableRef, InjectLocatorRef } from '../types';
 
 class InjectLocatorStore {
-  private _injects: Map<string, InjectableRef> = new Map();
+  private injects: Map<string, InjectableRef> = new Map();
 
   public set(injects: InjectLocatorRef[]): void {
     injects.forEach(({ name, use }) => {
-      this._injects.set(name, use);
+      this.injects.set(name, use);
     });
   }
 
   public get(key: string): InjectableRef | undefined {
-    return this._injects.get(key);
+    return this.injects.get(key);
   }
 
   public add(inject: string | InjectLocatorRef, ref?: InjectableRef): void {
     if (typeof inject !== 'string') {
       const { name, use } = inject as InjectLocatorRef;
 
-      this._injects.set(name, use);
+      this.injects.set(name, use);
     } else if (ref) {
-      this._injects.set(inject, ref);
+      this.injects.set(inject, ref);
     }
   }
 }
@@ -27,7 +27,7 @@ class InjectLocatorStore {
 export const InjectLocator = new InjectLocatorStore();
 
 export class InjectStore {
-  private _collection: Map<InjectableRef, InjectConfig[]> = new Map();
+  private collection: Map<InjectableRef, InjectConfig[]> = new Map();
 
   public add(config: InjectConfig): void {
     const { parent, index } = config;
@@ -38,7 +38,7 @@ export class InjectStore {
   }
 
   public get(parentRef: InjectableRef): InjectConfig[] {
-    const currentInjects = this._collection.get(parentRef);
+    const currentInjects = this.collection.get(parentRef);
 
     if (currentInjects) {
       return currentInjects;
@@ -46,7 +46,7 @@ export class InjectStore {
 
     const injects: InjectConfig[] = [];
 
-    this._collection.set(parentRef, injects);
+    this.collection.set(parentRef, injects);
 
     return injects;
   }
