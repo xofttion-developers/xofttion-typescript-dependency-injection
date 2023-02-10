@@ -1,8 +1,8 @@
 import { createInject } from '../factory';
 import { InjectableRef } from '../types';
 
-export function InjectSingleton(target: InjectableRef | string): Function;
-export function InjectSingleton(
+export function InjectRef(target: InjectableRef | string): Function;
+export function InjectRef(
   target: InjectableRef | string,
   scopeKey?: string
 ): ParameterDecorator {
@@ -19,8 +19,8 @@ export function InjectSingleton(
   };
 }
 
-export function InjectFactory(target: InjectableRef | string): Function;
-export function InjectFactory(
+export function InjectVar(target: InjectableRef | string): Function;
+export function InjectVar(
   target: InjectableRef | string,
   scopeKey?: string
 ): ParameterDecorator {
