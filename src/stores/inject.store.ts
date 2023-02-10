@@ -4,8 +4,8 @@ class InjectLocatorStore {
   private injects: Map<string, InjectableRef> = new Map();
 
   public set(injects: InjectLocatorRef[]): void {
-    injects.forEach(({ name, use }) => {
-      this.injects.set(name, use);
+    injects.forEach(({ name, useClass }) => {
+      this.injects.set(name, useClass);
     });
   }
 
@@ -15,9 +15,9 @@ class InjectLocatorStore {
 
   public add(inject: string | InjectLocatorRef, ref?: InjectableRef): void {
     if (typeof inject !== 'string') {
-      const { name, use } = inject as InjectLocatorRef;
+      const { name, useClass } = inject;
 
-      this.injects.set(name, use);
+      this.injects.set(name, useClass);
     } else if (ref) {
       this.injects.set(inject, ref);
     }

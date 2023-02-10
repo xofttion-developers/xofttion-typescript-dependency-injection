@@ -9,7 +9,7 @@ export type InjectConfig = {
 
 export type InjectLocatorRef = {
   name: string;
-  use: InjectableRef;
+  useClass: InjectableRef;
 };
 
 export type InjectRef<T = unknown> = InjectableRef<T> | string;
