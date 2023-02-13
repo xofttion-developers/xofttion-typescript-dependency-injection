@@ -1,38 +1,24 @@
 import { createInject } from '../factory';
 import { InjectableRef } from '../types';
 
-export function InjectRef(target: InjectableRef | string): Function;
-export function InjectRef(
-  target: InjectableRef | string,
-  scopeKey?: string
-): ParameterDecorator {
+export function InjectRef(target: InjectableRef | string): ParameterDecorator {
   return (parent, _key, index) => {
-    createInject(
-      {
-        target,
-        index,
-        parent: parent as Function,
-        singleton: true
-      },
-      scopeKey
-    );
+    createInject({
+      target,
+      index,
+      parent: parent as Function,
+      singleton: true
+    });
   };
 }
 
-export function InjectVar(target: InjectableRef | string): Function;
-export function InjectVar(
-  target: InjectableRef | string,
-  scopeKey?: string
-): ParameterDecorator {
+export function InjectVar(target: InjectableRef | string): ParameterDecorator {
   return (parent, _key, index) => {
-    createInject(
-      {
-        target,
-        index,
-        parent: parent as Function,
-        singleton: false
-      },
-      scopeKey
-    );
+    createInject({
+      target,
+      index,
+      parent: parent as Function,
+      singleton: false
+    });
   };
 }
