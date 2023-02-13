@@ -1,7 +1,7 @@
 {
   "name": "@xofttion/dependency-injection",
   "type": "commonjs",
-  "version": "4.4.4",
+  "version": "4.5.0",
   "author": "Daniel Andrés Castillo Pedroza",
   "license": "MIT",
   "main": "dist/index.js",
@@ -14,6 +14,9 @@
     "build": "tsc -p tsconfig.json",
     "test": "jest",
     "launch": "ts-node index.ts"
+  },
+  "dependencies": {
+    "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
     "@types/jest": "^28.1.8",

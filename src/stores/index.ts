@@ -1,3 +1,3 @@
 export * from './inject.store';
 export * from './injectable.store';
-export * from './instance.store';
+export * from './object.store';
