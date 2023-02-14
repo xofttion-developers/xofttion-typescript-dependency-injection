@@ -1,14 +1,14 @@
-import scope from './scope-container';
+import RootContainer from './container';
 import { InjectableConfig, InjectConfig, InjectionConfig } from './types';
 
 export function createInjectable(ref: InjectableConfig): void {
-  scope.addInjectable(ref);
+  RootContainer.pushInjectable(ref);
 }
 
 export function createInject(ref: InjectConfig): void {
-  scope.addInject(ref);
+  RootContainer.pushInject(ref);
 }
 
 export function InjectionFactory<T = unknown>(config: InjectionConfig<T>): T {
-  return scope.createInjectable(config);
+  return RootContainer.createInjectable(config);
 }

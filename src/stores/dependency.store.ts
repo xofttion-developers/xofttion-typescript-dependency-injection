@@ -1,6 +1,6 @@
 import { InjectableRef } from '../types';
 
-export class ObjectStore {
+export class DependencyStore {
   private collection: Map<InjectableRef, unknown> = new Map();
 
   public add(dependency: InjectableRef, value: unknown): void {

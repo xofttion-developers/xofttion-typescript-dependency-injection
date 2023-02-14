@@ -4,6 +4,7 @@ export type InjectConfig = {
   target: InjectableRef | string;
   index: number;
   parent: InjectableRef;
+  container: boolean;
   singleton: boolean;
 };
 

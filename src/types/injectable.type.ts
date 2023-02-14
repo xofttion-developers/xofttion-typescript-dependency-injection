@@ -1,5 +1,5 @@
 import { Constructable } from './constructable.type';
-import { ContextType } from './context.type';
+import { ScopeType } from './scope.type';
 
 export type InjectableConfig = {
   target: InjectableRef;
@@ -8,7 +8,7 @@ export type InjectableConfig = {
 
 export type InjectionConfig<T> = {
   ref: InjectableRef<T>;
-  context?: ContextType;
+  scope?: ScopeType;
 };
 
 export type InjectableRef<T = unknown> =
