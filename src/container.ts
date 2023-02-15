@@ -86,9 +86,9 @@ class Container {
           return refObject;
         }
 
-        const refValue = this.createObject({ ref, scope, store });
+        const refValue = this.createObject({ ref: refInject, scope, store });
 
-        store.add(ref, refValue);
+        store.add(refInject, refValue);
 
         return refValue;
       }
