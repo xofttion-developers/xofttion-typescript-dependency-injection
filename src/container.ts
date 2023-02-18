@@ -6,19 +6,18 @@ import {
 } from './stores';
 import {
   Constructable,
-  ScopeType,
   InjectableConfig,
   InjectableRef,
   InjectConfig,
   InjectionConfig,
   InjectRef,
-  OnScope
+  ScopeStore
 } from './types';
 import 'reflect-metadata';
 
 type ContainerProps<T> = {
   ref: InjectableRef<T>;
-  scope?: ScopeType;
+  scope?: ScopeStore;
   store?: DependencyStore;
 };
 
@@ -67,7 +66,11 @@ class Container {
         return this.createObject({ ref: refParam, scope });
       }
 
-      const { singleton, container, target } = configs[index];
+      const { singleton, container, target, key } = configs[index];
+
+      if (key === 'scope') {
+        return scope;
+      }
 
       const refInject = this.getInjectableRef(target);
 
@@ -96,13 +99,7 @@ class Container {
       return this.createObject({ ref: refInject, scope, store });
     });
 
-    const object = new ConstructorObj(...(params || []));
-
-    if (scope && isScope(object)) {
-      object.setScope(scope);
-    }
-
-    return object; // Returning generated object
+    return new ConstructorObj([...(params || [])]);
   }
 
   private getSingleton<T = unknown>({ ref, store }: ContainerProps<T>): T {
@@ -124,10 +121,6 @@ class Container {
   }
 }
 
-function isScope(object: any): object is OnScope {
-  return 'setScope' in object;
-}
+const rootContainer = new Container();
 
-const RootContainer = new Container();
-
-export default RootContainer;
+export default rootContainer;
