@@ -1,14 +1,14 @@
-import RootContainer from './container';
+import rootContainer from './container';
 import { InjectableConfig, InjectConfig, InjectionConfig } from './types';
 
 export function createInjectable(ref: InjectableConfig): void {
-  RootContainer.pushInjectable(ref);
+  rootContainer.pushInjectable(ref);
 }
 
 export function createInject(ref: InjectConfig): void {
-  RootContainer.pushInject(ref);
+  rootContainer.pushInject(ref);
 }
 
 export function InjectionFactory<T = unknown>(config: InjectionConfig<T>): T {
-  return RootContainer.createInjectable(config);
+  return rootContainer.createInjectable(config);
 }
