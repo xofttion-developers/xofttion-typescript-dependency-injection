@@ -99,7 +99,7 @@ class Container {
       return this.createObject({ ref: refInject, scope, store });
     });
 
-    return new ConstructorObj([...(params || [])]);
+    return new ConstructorObj(...(params || []));
   }
 
   private getSingleton<T = unknown>({ ref, store }: ContainerProps<T>): T {
