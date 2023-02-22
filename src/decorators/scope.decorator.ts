@@ -8,7 +8,7 @@ export function Scope(): ParameterDecorator {
       index,
       parent: parent as Function,
       singleton: false,
-      container: false
+      factory: false
     });
   };
 }

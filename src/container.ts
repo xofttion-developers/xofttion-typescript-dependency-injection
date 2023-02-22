@@ -23,7 +23,7 @@ type ContainerProps<T> = {
 
 const metaKey = 'design:paramtypes';
 
-class Container {
+export class InjectionContainer {
   private injectables = new InjectableStore();
 
   private injects = new InjectStore();
@@ -66,7 +66,7 @@ class Container {
         return this.createObject({ ref: refParam, scope });
       }
 
-      const { singleton, container, target, key } = configs[index];
+      const { singleton, factory: container, target, key } = configs[index];
 
       if (key === 'scope') {
         return scope;
@@ -120,7 +120,3 @@ class Container {
     return typeof ref === 'string' ? InjectLocator.get(ref) : ref;
   }
 }
-
-const rootContainer = new Container();
-
-export default rootContainer;

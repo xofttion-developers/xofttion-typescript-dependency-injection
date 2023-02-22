@@ -1,11 +1,11 @@
-import { InjectConfig, InjectableRef, InjectLocatorRef } from '../types';
+import { InjectConfig, InjectableRef, InjectLocatorRef, ProvideKey } from '../types';
 
 class InjectLocatorStore {
-  private injects: Map<string, InjectableRef> = new Map();
+  private injects: Map<ProvideKey, InjectableRef> = new Map();
 
   public set(injects: InjectLocatorRef[]): void {
-    injects.forEach(({ name, useClass }) => {
-      this.injects.set(name, useClass);
+    injects.forEach(({ provide, useClass }) => {
+      this.injects.set(provide, useClass);
     });
   }
 
@@ -15,9 +15,9 @@ class InjectLocatorStore {
 
   public add(inject: string | InjectLocatorRef, ref?: InjectableRef): void {
     if (typeof inject !== 'string') {
-      const { name, useClass } = inject;
+      const { provide, useClass } = inject;
 
-      this.injects.set(name, useClass);
+      this.injects.set(provide, useClass);
     } else if (ref) {
       this.injects.set(inject, ref);
     }

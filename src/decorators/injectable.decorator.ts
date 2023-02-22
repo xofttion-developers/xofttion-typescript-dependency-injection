@@ -1,13 +1,11 @@
 import { createInjectable } from '../factory';
 
-export function Singleton(): ClassDecorator {
-  return (target) => {
-    createInjectable({ target, singleton: true });
-  };
-}
+type InjectableConfig = {
+  singleton: boolean;
+};
 
-export function Factory(): ClassDecorator {
+export function Injectable({ singleton }: InjectableConfig): ClassDecorator {
   return (target) => {
-    createInjectable({ target, singleton: false });
+    createInjectable({ target, singleton });
   };
 }
