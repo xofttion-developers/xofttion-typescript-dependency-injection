@@ -1,18 +1,21 @@
 import { InjectableRef } from './injectable.type';
 
-type InjectConfigKey = 'class' | 'scope';
+type InjectConfigKey = 'object' | 'scope';
 
 export type InjectConfig = {
   target: InjectableRef | string;
   key: InjectConfigKey;
   index: number;
   parent: InjectableRef;
-  container: boolean;
+  factory: boolean;
   singleton: boolean;
 };
 
+export type ProvideKey = InjectableRef | string;
+
 export type InjectLocatorRef = {
-  name: string;
+  provide: ProvideKey;
+  useValue?: any;
   useClass: InjectableRef;
 };
 

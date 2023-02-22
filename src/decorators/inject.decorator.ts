@@ -1,41 +1,41 @@
 import { createInject } from '../factory';
 import { InjectableRef } from '../types';
 
-export function InjectRef(target: InjectableRef | string): ParameterDecorator {
+export function Singleton(target: InjectableRef | string): ParameterDecorator {
   return (parent, _key, index) => {
     createInject({
       target,
-      key: 'class',
+      key: 'object',
       index,
       parent: parent as Function,
       singleton: true,
-      container: false
+      factory: false
     });
   };
 }
 
-export function InjectVar(target: InjectableRef | string): ParameterDecorator {
+export function Factory(target: InjectableRef | string): ParameterDecorator {
   return (parent, _key, index) => {
     createInject({
       target,
-      key: 'class',
+      key: 'object',
       index,
       parent: parent as Function,
       singleton: false,
-      container: false
+      factory: false
     });
   };
 }
 
-export function InjectScp(target: InjectableRef | string): ParameterDecorator {
+export function Inject(target: InjectableRef | string): ParameterDecorator {
   return (parent, _key, index) => {
     createInject({
       target,
-      key: 'class',
+      key: 'object',
       index,
       parent: parent as Function,
       singleton: false,
-      container: true
+      factory: true
     });
   };
 }
