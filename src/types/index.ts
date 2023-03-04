@@ -1,4 +1,3 @@
 export * from './constructable.type';
-export * from './inject.type';
+export * from './dependency.type';
 export * from './injectable.type';
-export * from './scope.type';
