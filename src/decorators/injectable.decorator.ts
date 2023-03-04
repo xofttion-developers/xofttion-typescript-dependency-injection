@@ -1,4 +1,4 @@
-import { createInjectable } from '../factory';
+import { createInjectable } from '../factories';
 
 type InjectableConfig = {
   singleton: boolean;

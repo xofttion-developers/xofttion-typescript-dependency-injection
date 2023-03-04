@@ -1,3 +1,3 @@
-export * from './inject.decorator';
+export * from './dependency.decorator';
 export * from './injectable.decorator';
-export * from './scope.decorator';
+export * from './namespace.decorator';
