@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import {
-  DependencyLocator,
   DependencyStore,
   InjectableStore,
+  locator,
   NamespaceStore,
   ScopeStore
 } from '../stores';
@@ -21,7 +21,7 @@ type Props<T> = {
   store?: ScopeStore;
 };
 
-const metaKey = 'design:paramtypes';
+const metadataKey = 'design:paramtypes';
 
 export class WarehouseContainer {
   private readonly injectables: InjectableStore;
@@ -65,7 +65,7 @@ export class WarehouseContainer {
 
     const configs = this.dependencies.get(token);
 
-    const tokens: InjectableToken[] = Reflect.getMetadata(metaKey, ConstructorObj);
+    const tokens: InjectableToken[] = Reflect.getMetadata(metadataKey, ConstructorObj);
 
     const params = tokens?.map((depToken, index) => {
       if (!configs[index]) {
@@ -124,7 +124,7 @@ export class WarehouseContainer {
 
   private getInjectableToken(key: DependencyKey): InjectableToken | undefined {
     return typeof key === 'string' || typeof key === 'symbol'
-      ? DependencyLocator.get(key)
+      ? locator.get(key)
       : key;
   }
 }

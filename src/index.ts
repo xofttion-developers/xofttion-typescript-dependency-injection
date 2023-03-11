@@ -1,7 +1,8 @@
-import { Warehouse } from './factories';
+import { warehouse } from './factories';
 
 export { Factory, Injectable, Namespace, Scope, Singleton } from './decorators';
-export { DependencyLocator, NamespaceStore } from './stores';
-export { DependencyLocatorConfig } from './types';
+export { createInject, createInjectable } from './factories';
+export { locator, NamespaceStore } from './stores';
+export { LocatorConfig } from './types';
 
-export default Warehouse;
+export default warehouse;

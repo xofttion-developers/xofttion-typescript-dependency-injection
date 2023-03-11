@@ -11,6 +11,6 @@ export function createInject(ref: DependencyConfig): void {
   root.pushDependency(ref);
 }
 
-export function Warehouse<T = unknown>(config: InjectionConfig<T>): T {
+export function warehouse<T = unknown>(config: InjectionConfig<T>): T {
   return root.createInjectable(config);
 }
