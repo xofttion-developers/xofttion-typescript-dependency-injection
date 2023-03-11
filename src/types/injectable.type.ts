@@ -1,4 +1,4 @@
-import { NamespaceStore } from '../stores';
+import { WorkspaceStore } from '../stores';
 import { Constructable } from './constructable.type';
 
 export type InjectableToken<T = unknown> =
@@ -14,5 +14,5 @@ export type InjectableConfig = {
 
 export type InjectionConfig<T> = {
   token: InjectableToken<T>;
-  namespace?: NamespaceStore;
+  workspace?: WorkspaceStore;
 };

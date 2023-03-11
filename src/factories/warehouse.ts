@@ -3,8 +3,8 @@ import {
   DependencyStore,
   InjectableStore,
   locator,
-  NamespaceStore,
-  ScopeStore
+  ScopeStore,
+  WorkspaceStore
 } from '../stores';
 import {
   Constructable,
@@ -17,11 +17,11 @@ import {
 
 type Props<T> = {
   token: InjectableToken<T>;
-  namespace?: NamespaceStore;
+  workspace?: WorkspaceStore;
   store?: ScopeStore;
 };
 
-const metadataKey = 'design:paramtypes';
+const key = 'design:paramtypes';
 
 export class WarehouseContainer {
   private readonly injectables: InjectableStore;
@@ -45,7 +45,7 @@ export class WarehouseContainer {
   }
 
   public createInjectable<T = unknown>(config: InjectionConfig<T>): T {
-    const { token, namespace } = config;
+    const { token, workspace } = config;
     const injConfig = this.injectables.get(token);
 
     if (!injConfig) {
@@ -56,36 +56,36 @@ export class WarehouseContainer {
     const store = new ScopeStore();
 
     return singleton
-      ? this.getSingleton<T>({ token: target, namespace, store })
-      : this.createObject<T>({ token: target, namespace, store });
+      ? this.getSingleton<T>({ token: target, workspace, store })
+      : this.createObject<T>({ token: target, workspace, store });
   }
 
-  private createObject<T = unknown>({ token, namespace, store }: Props<T>): T {
+  private createObject<T = unknown>({ token, workspace, store }: Props<T>): T {
     const ConstructorObj = token as unknown as Constructable<T>;
 
     const configs = this.dependencies.get(token);
 
-    const tokens: InjectableToken[] = Reflect.getMetadata(metadataKey, ConstructorObj);
+    const tokens: InjectableToken[] = Reflect.getMetadata(key, ConstructorObj);
 
     const params = tokens?.map((depToken, index) => {
       if (!configs[index]) {
-        return this.createObject({ token: depToken, namespace });
+        return this.createObject({ token: depToken, workspace });
       }
 
       const { singleton, factory, target } = configs[index];
 
       if (target === undefined) {
-        return namespace;
+        return workspace;
       }
 
       const injToken = this.getInjectableToken(target);
 
       if (!injToken) {
-        return this.createObject({ token: depToken, namespace });
+        return this.createObject({ token: depToken, workspace });
       }
 
       if (singleton) {
-        return this.getSingleton({ token: injToken, namespace, store });
+        return this.getSingleton({ token: injToken, workspace, store });
       }
 
       if (factory && store) {
@@ -95,14 +95,18 @@ export class WarehouseContainer {
           return depObject;
         }
 
-        const depValue = this.createObject({ token: injToken, namespace, store });
+        const depValue = this.createObject({
+          token: injToken,
+          workspace,
+          store
+        });
 
         store.add(injToken, depValue);
 
         return depValue;
       }
 
-      return this.createObject({ token: injToken, namespace, store });
+      return this.createObject({ token: injToken, workspace, store });
     });
 
     return new ConstructorObj(...(params || []));
