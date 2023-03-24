@@ -1,6 +1,6 @@
 import { createInject } from '../factories';
 
-export function Namespace(): ParameterDecorator {
+export function Workspace(): ParameterDecorator {
   return (parent, _, index) => {
     createInject({
       parent,

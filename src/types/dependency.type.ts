@@ -10,10 +10,4 @@ export type DependencyConfig = {
   singleton: boolean;
 };
 
-export type DependencyLocatorConfig = {
-  token: DependencyToken;
-  useClass: InjectableToken;
-  useValue?: any;
-};
-
 export type DependencyKey<T = unknown> = InjectableToken<T> | string | symbol;
