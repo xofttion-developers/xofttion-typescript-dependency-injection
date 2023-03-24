@@ -9,7 +9,6 @@ import {
 import {
   Constructable,
   DependencyConfig,
-  DependencyKey,
   InjectableConfig,
   InjectableToken,
   InjectionConfig
@@ -21,7 +20,7 @@ type Props<T> = {
   store?: ScopeStore;
 };
 
-const key = 'design:paramtypes';
+const KEY = 'design:paramtypes';
 
 export class WarehouseContainer {
   private readonly injectables: InjectableStore;
@@ -65,9 +64,15 @@ export class WarehouseContainer {
 
     const configs = this.dependencies.get(token);
 
-    const tokens: InjectableToken[] = Reflect.getMetadata(key, ConstructorObj);
+    const tokens: InjectableToken[] = Reflect.getMetadata(KEY, ConstructorObj);
 
     const params = tokens?.map((depToken, index) => {
+      const depInjToken = locator.get(depToken);
+
+      if (depInjToken) {
+        return this.createObject({ token: depInjToken, workspace });
+      }
+
       if (!configs[index]) {
         return this.createObject({ token: depToken, workspace });
       }
@@ -78,7 +83,7 @@ export class WarehouseContainer {
         return workspace;
       }
 
-      const injToken = this.getInjectableToken(target);
+      const injToken = locator.get(target);
 
       if (!injToken) {
         return this.createObject({ token: depToken, workspace });
@@ -124,11 +129,5 @@ export class WarehouseContainer {
     this.scopes.add(token, scpValue);
 
     return scpValue;
-  }
-
-  private getInjectableToken(key: DependencyKey): InjectableToken | undefined {
-    return typeof key === 'string' || typeof key === 'symbol'
-      ? locator.get(key)
-      : key;
   }
 }

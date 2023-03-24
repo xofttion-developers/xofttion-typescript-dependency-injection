@@ -13,8 +13,8 @@ class LocatorStore {
     });
   }
 
-  public get(reference: string | symbol): InjectableToken | undefined {
-    return this.dependencies.get(reference);
+  public get(token: DependencyToken): InjectableToken | undefined {
+    return this.dependencies.get(token);
   }
 
   public add(

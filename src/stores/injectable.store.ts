@@ -7,7 +7,7 @@ export class InjectableStore {
     this.collection.set(config.target, config);
   }
 
-  public get(injectable: InjectableToken): InjectableConfig | undefined {
-    return this.collection.get(injectable);
+  public get(token: InjectableToken): InjectableConfig | undefined {
+    return this.collection.get(token);
   }
 }
