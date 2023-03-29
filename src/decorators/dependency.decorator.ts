@@ -7,8 +7,8 @@ export function Singleton(target: DependencyToken): ParameterDecorator {
       target,
       index,
       parent,
-      singleton: true,
-      factory: false
+      scopeable: false,
+      singleton: true
     });
   };
 }
@@ -19,8 +19,8 @@ export function Factory(target: DependencyToken): ParameterDecorator {
       target,
       index,
       parent,
-      singleton: false,
-      factory: false
+      scopeable: false,
+      singleton: false
     });
   };
 }
@@ -31,8 +31,8 @@ export function Scope(target: DependencyToken): ParameterDecorator {
       target,
       index,
       parent,
-      singleton: false,
-      factory: true
+      scopeable: true,
+      singleton: false
     });
   };
 }

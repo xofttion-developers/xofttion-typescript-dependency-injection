@@ -14,10 +14,23 @@ import {
   InjectionConfig
 } from '../types';
 
-type Props<T> = {
+type DependencyProps<T> = {
+  config: DependencyConfig;
   token: InjectableToken<T>;
-  workspace?: WorkspaceStore;
   store?: ScopeStore;
+  workspace?: WorkspaceStore;
+};
+
+type InjectProps<T> = {
+  token: InjectableToken<T>;
+  store?: ScopeStore;
+  workspace?: WorkspaceStore;
+};
+
+type StoreProps<T> = {
+  token: InjectableToken<T>;
+  store: ScopeStore;
+  workspace?: WorkspaceStore;
 };
 
 const KEY = 'design:paramtypes';
@@ -44,90 +57,106 @@ export class WarehouseContainer {
   }
 
   public createInjectable<T = unknown>(config: InjectionConfig<T>): T {
-    const { token, workspace } = config;
-    const injConfig = this.injectables.get(token);
+    const { token: refInjectable, workspace } = config;
+    const injectable = this.injectables.get(refInjectable);
 
-    if (!injConfig) {
-      throw Error(`Class ${token.toString()} is not found in the collection`);
+    if (!injectable) {
+      throw Error(
+        `Class ${refInjectable.toString()} is not found in the collection`
+      );
     }
 
-    const { singleton, target } = injConfig;
+    const { singleton, target: token } = injectable;
     const store = new ScopeStore();
 
     return singleton
-      ? this.getSingleton<T>({ token: target, workspace, store })
-      : this.createObject<T>({ token: target, workspace, store });
+      ? this.fetchSingleton<T>({ token, workspace, store })
+      : this.createObject<T>({ token, workspace, store });
   }
 
-  private createObject<T = unknown>({ token, workspace, store }: Props<T>): T {
-    const ConstructorObj = token as unknown as Constructable<T>;
+  private createObject<T = unknown>(props: InjectProps<T>): T {
+    const { token, workspace, store } = props;
 
-    const configs = this.dependencies.get(token);
+    const Class = token as unknown as Constructable<T>;
 
-    const tokens: InjectableToken[] = Reflect.getMetadata(KEY, ConstructorObj);
+    const dependencies = this.dependencies.get(token);
 
-    const params = tokens?.map((depToken, index) => {
-      const depInjToken = locator.get(depToken);
+    const tokens: InjectableToken[] = Reflect.getMetadata(KEY, Class);
 
-      if (depInjToken) {
-        return this.createObject({ token: depInjToken, workspace });
+    const params = tokens?.map((token, index) => {
+      if (dependencies[index]) {
+        return this.createFromDependencyConfig({
+          token,
+          workspace,
+          store,
+          config: dependencies[index]
+        });
       }
 
-      if (!configs[index]) {
-        return this.createObject({ token: depToken, workspace });
+      const locatorToken = locator.get(token);
+
+      if (locatorToken) {
+        return store
+          ? this.fetchFromStore({ token: locatorToken, workspace, store })
+          : this.createObject({ token: locatorToken, workspace });
       }
 
-      const { singleton, factory, target } = configs[index];
-
-      if (target === undefined) {
+      if (token === WorkspaceStore) {
         return workspace;
       }
 
-      const injToken = locator.get(target);
-
-      if (!injToken) {
-        return this.createObject({ token: depToken, workspace });
-      }
-
-      if (singleton) {
-        return this.getSingleton({ token: injToken, workspace, store });
-      }
-
-      if (factory && store) {
-        const depObject = store.get(injToken);
-
-        if (depObject) {
-          return depObject;
-        }
-
-        const depValue = this.createObject({
-          token: injToken,
-          workspace,
-          store
-        });
-
-        store.add(injToken, depValue);
-
-        return depValue;
-      }
-
-      return this.createObject({ token: injToken, workspace, store });
+      return this.createObject({ token, workspace, store });
     });
 
-    return new ConstructorObj(...(params || []));
+    return new Class(...(params || []));
   }
 
-  private getSingleton<T = unknown>({ token, store }: Props<T>): T {
-    const scpObject = this.scopes.get<T>(token);
+  private fetchSingleton<T = unknown>({ token, workspace }: InjectProps<T>): T {
+    return this.fetchFromStore({ token, workspace, store: this.scopes });
+  }
 
-    if (scpObject) {
-      return scpObject;
+  private fetchFromStore<T = unknown>({
+    token,
+    workspace,
+    store
+  }: StoreProps<T>): T {
+    const singleton = store.get<T>(token);
+
+    if (singleton) {
+      return singleton;
     }
 
-    const scpValue = this.createObject({ token, store });
+    const object = this.createObject({ token, workspace, store });
 
-    this.scopes.add(token, scpValue);
+    store.add(token, object);
 
-    return scpValue;
+    return object;
+  }
+
+  private createFromDependencyConfig<T = unknown>(
+    props: DependencyProps<T>
+  ): unknown {
+    const {
+      token,
+      store,
+      workspace,
+      config: { scopeable, singleton, target }
+    } = props;
+
+    const locatorToken = locator.get(target);
+
+    if (locatorToken && singleton) {
+      return this.fetchSingleton({ token: locatorToken, workspace });
+    }
+
+    if (locatorToken && scopeable && store) {
+      return this.fetchFromStore({
+        token: locatorToken,
+        workspace,
+        store
+      });
+    }
+
+    return this.createObject({ token, workspace });
   }
 }

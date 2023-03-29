@@ -3,10 +3,10 @@ import { InjectableToken } from './injectable.type';
 export type DependencyToken = InjectableToken | string | symbol;
 
 export type DependencyConfig = {
-  target?: DependencyToken;
+  target: DependencyToken;
   index: number;
   parent: InjectableToken;
-  factory: boolean;
+  scopeable: boolean;
   singleton: boolean;
 };
 
