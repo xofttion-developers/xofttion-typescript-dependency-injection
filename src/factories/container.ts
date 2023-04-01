@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 import {
+  Context,
   DependencyStore,
   InjectableStore,
   locator,
-  Scope,
-  WorkSpace
+  Scope
 } from '../stores';
 import {
   Constructable,
@@ -17,20 +17,20 @@ import {
 type DependencyProps<T> = {
   config: DependencyConfig;
   token: InjectableToken<T>;
+  context?: Context;
   scope?: Scope;
-  workspace?: WorkSpace;
 };
 
 type InjectProps<T> = {
   token: InjectableToken<T>;
+  context?: Context;
   scope?: Scope;
-  workspace?: WorkSpace;
 };
 
 type StoreProps<T> = {
   token: InjectableToken<T>;
+  context?: Context;
   scope: Scope;
-  workspace?: WorkSpace;
 };
 
 const KEY = 'design:paramtypes';
@@ -57,7 +57,7 @@ export class ContainerFactory {
   }
 
   public createInjectable<T = unknown>(config: InjectionConfig<T>): T {
-    const { token: refInjectable, workspace } = config;
+    const { token: refInjectable, context } = config;
     const injectable = this.injectables.get(refInjectable);
 
     if (!injectable) {
@@ -70,12 +70,12 @@ export class ContainerFactory {
     const scope = new Scope();
 
     return singleton
-      ? this.fetchSingleton<T>({ token, workspace, scope })
-      : this.createObject<T>({ token, workspace, scope });
+      ? this.fetchSingleton<T>({ token, context, scope })
+      : this.createObject<T>({ token, context, scope });
   }
 
   private createObject<T = unknown>(props: InjectProps<T>): T {
-    const { token, workspace, scope } = props;
+    const { token, context, scope } = props;
 
     const Class = token as unknown as Constructable<T>;
 
@@ -88,7 +88,7 @@ export class ContainerFactory {
         return this.createFromDependencyConfig({
           token,
           scope,
-          workspace,
+          context,
           config: dependencies[index]
         });
       }
@@ -97,36 +97,32 @@ export class ContainerFactory {
 
       if (locatorToken) {
         return scope
-          ? this.fetchFromStore({ token: locatorToken, workspace, scope })
-          : this.createObject({ token: locatorToken, workspace });
+          ? this.fetchFromStore({ token: locatorToken, context, scope })
+          : this.createObject({ token: locatorToken, context });
       }
 
-      if (token === WorkSpace) {
-        return workspace;
+      if (token === Context) {
+        return context;
       }
 
-      return this.createObject({ token, workspace, scope });
+      return this.createObject({ token, context, scope });
     });
 
     return new Class(...(params || []));
   }
 
-  private fetchSingleton<T = unknown>({ token, workspace }: InjectProps<T>): T {
-    return this.fetchFromStore({ token, workspace, scope: this.scopes });
+  private fetchSingleton<T = unknown>({ token, context }: InjectProps<T>): T {
+    return this.fetchFromStore({ token, context, scope: this.scopes });
   }
 
-  private fetchFromStore<T = unknown>({
-    token,
-    scope,
-    workspace
-  }: StoreProps<T>): T {
+  private fetchFromStore<T = unknown>({ token, scope, context }: StoreProps<T>): T {
     const singleton = scope.get<T>(token);
 
     if (singleton) {
       return singleton;
     }
 
-    const object = this.createObject({ token, workspace, scope });
+    const object = this.createObject({ token, context, scope });
 
     scope.add(token, object);
 
@@ -137,26 +133,26 @@ export class ContainerFactory {
     props: DependencyProps<T>
   ): unknown {
     const {
+      context,
       token,
       scope,
-      workspace,
       config: { scopeable, singleton, target }
     } = props;
 
     const locatorToken = locator.get(target);
 
     if (locatorToken && singleton) {
-      return this.fetchSingleton({ token: locatorToken, workspace });
+      return this.fetchSingleton({ token: locatorToken, context });
     }
 
     if (locatorToken && scopeable && scope) {
       return this.fetchFromStore({
         token: locatorToken,
         scope,
-        workspace
+        context
       });
     }
 
-    return this.createObject({ token, workspace });
+    return this.createObject({ token, context });
   }
 }
