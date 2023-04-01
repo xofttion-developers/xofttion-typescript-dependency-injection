@@ -1,4 +1,4 @@
-export class WorkspaceStore extends Map<string, unknown> {
+export class WorkSpace extends Map<string, unknown> {
   public getValue<T = unknown>(key: string): T | undefined {
     return this.has(key) ? (this.get(key) as T) : undefined;
   }

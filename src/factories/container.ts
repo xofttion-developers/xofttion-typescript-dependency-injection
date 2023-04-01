@@ -3,8 +3,8 @@ import {
   DependencyStore,
   InjectableStore,
   locator,
-  ScopeStore,
-  WorkspaceStore
+  Scope,
+  WorkSpace
 } from '../stores';
 import {
   Constructable,
@@ -17,34 +17,34 @@ import {
 type DependencyProps<T> = {
   config: DependencyConfig;
   token: InjectableToken<T>;
-  store?: ScopeStore;
-  workspace?: WorkspaceStore;
+  scope?: Scope;
+  workspace?: WorkSpace;
 };
 
 type InjectProps<T> = {
   token: InjectableToken<T>;
-  store?: ScopeStore;
-  workspace?: WorkspaceStore;
+  scope?: Scope;
+  workspace?: WorkSpace;
 };
 
 type StoreProps<T> = {
   token: InjectableToken<T>;
-  store: ScopeStore;
-  workspace?: WorkspaceStore;
+  scope: Scope;
+  workspace?: WorkSpace;
 };
 
 const KEY = 'design:paramtypes';
 
-export class WarehouseContainer {
+export class ContainerFactory {
   private readonly injectables: InjectableStore;
 
-  private readonly scopes: ScopeStore;
+  private readonly scopes: Scope;
 
   private readonly dependencies: DependencyStore;
 
   constructor() {
     this.injectables = new InjectableStore();
-    this.scopes = new ScopeStore();
+    this.scopes = new Scope();
     this.dependencies = new DependencyStore();
   }
 
@@ -67,15 +67,15 @@ export class WarehouseContainer {
     }
 
     const { singleton, target: token } = injectable;
-    const store = new ScopeStore();
+    const scope = new Scope();
 
     return singleton
-      ? this.fetchSingleton<T>({ token, workspace, store })
-      : this.createObject<T>({ token, workspace, store });
+      ? this.fetchSingleton<T>({ token, workspace, scope })
+      : this.createObject<T>({ token, workspace, scope });
   }
 
   private createObject<T = unknown>(props: InjectProps<T>): T {
-    const { token, workspace, store } = props;
+    const { token, workspace, scope } = props;
 
     const Class = token as unknown as Constructable<T>;
 
@@ -87,8 +87,8 @@ export class WarehouseContainer {
       if (dependencies[index]) {
         return this.createFromDependencyConfig({
           token,
+          scope,
           workspace,
-          store,
           config: dependencies[index]
         });
       }
@@ -96,39 +96,39 @@ export class WarehouseContainer {
       const locatorToken = locator.get(token);
 
       if (locatorToken) {
-        return store
-          ? this.fetchFromStore({ token: locatorToken, workspace, store })
+        return scope
+          ? this.fetchFromStore({ token: locatorToken, workspace, scope })
           : this.createObject({ token: locatorToken, workspace });
       }
 
-      if (token === WorkspaceStore) {
+      if (token === WorkSpace) {
         return workspace;
       }
 
-      return this.createObject({ token, workspace, store });
+      return this.createObject({ token, workspace, scope });
     });
 
     return new Class(...(params || []));
   }
 
   private fetchSingleton<T = unknown>({ token, workspace }: InjectProps<T>): T {
-    return this.fetchFromStore({ token, workspace, store: this.scopes });
+    return this.fetchFromStore({ token, workspace, scope: this.scopes });
   }
 
   private fetchFromStore<T = unknown>({
     token,
-    workspace,
-    store
+    scope,
+    workspace
   }: StoreProps<T>): T {
-    const singleton = store.get<T>(token);
+    const singleton = scope.get<T>(token);
 
     if (singleton) {
       return singleton;
     }
 
-    const object = this.createObject({ token, workspace, store });
+    const object = this.createObject({ token, workspace, scope });
 
-    store.add(token, object);
+    scope.add(token, object);
 
     return object;
   }
@@ -138,7 +138,7 @@ export class WarehouseContainer {
   ): unknown {
     const {
       token,
-      store,
+      scope,
       workspace,
       config: { scopeable, singleton, target }
     } = props;
@@ -149,11 +149,11 @@ export class WarehouseContainer {
       return this.fetchSingleton({ token: locatorToken, workspace });
     }
 
-    if (locatorToken && scopeable && store) {
+    if (locatorToken && scopeable && scope) {
       return this.fetchFromStore({
         token: locatorToken,
-        workspace,
-        store
+        scope,
+        workspace
       });
     }
 

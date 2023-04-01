@@ -1,6 +1,6 @@
 import { InjectableToken } from '../types';
 
-export class ScopeStore {
+export class Scope {
   private readonly collection: Map<InjectableToken, unknown>;
 
   constructor() {
