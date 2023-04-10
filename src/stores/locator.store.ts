@@ -13,7 +13,7 @@ class LocatorStore {
     });
   }
 
-  public get(token: DependencyToken): InjectableToken | undefined {
+  public get(token: DependencyToken): Undefined<InjectableToken> {
     return this.dependencies.get(token);
   }
 
