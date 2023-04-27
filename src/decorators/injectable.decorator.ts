@@ -1,4 +1,4 @@
-import { createInjectable } from '../factories';
+import { storeInjectable } from '../factories';
 
 type InjectableConfig = {
   singleton: boolean;
@@ -6,6 +6,6 @@ type InjectableConfig = {
 
 export function Injectable({ singleton }: InjectableConfig): ClassDecorator {
   return (target) => {
-    createInjectable({ target, singleton });
+    storeInjectable({ target, singleton });
   };
 }

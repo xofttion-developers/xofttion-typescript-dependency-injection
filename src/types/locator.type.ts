@@ -1,8 +1,8 @@
-import { DependencyToken } from './dependency.type';
+import { InjectToken } from './dependency.type';
 import { InjectableToken } from './injectable.type';
 
 export type LocatorConfig = {
-  token: DependencyToken;
+  token: InjectToken;
   useClass: InjectableToken;
   useValue?: any;
 };

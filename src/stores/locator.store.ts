@@ -1,7 +1,7 @@
-import { LocatorConfig, DependencyToken, InjectableToken } from '../types';
+import { LocatorConfig, InjectToken, InjectableToken } from '../types';
 
 class LocatorStore {
-  private dependencies: Map<DependencyToken, InjectableToken>;
+  private dependencies: Map<InjectToken, InjectableToken>;
 
   constructor() {
     this.dependencies = new Map();
@@ -13,7 +13,7 @@ class LocatorStore {
     });
   }
 
-  public get(token: DependencyToken): Undefined<InjectableToken> {
+  public get(token: InjectToken): Undefined<InjectableToken> {
     return this.dependencies.get(token);
   }
 

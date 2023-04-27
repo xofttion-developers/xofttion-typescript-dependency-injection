@@ -1,27 +1,27 @@
-import { DependencyConfig, InjectableToken } from '../types';
+import { InjectConfig, InjectableToken } from '../types';
 
-export class DependencyStore {
-  private collection: Map<InjectableToken, DependencyConfig[]> = new Map();
+export class InjectStore {
+  private collection: Map<InjectableToken, InjectConfig[]> = new Map();
 
-  public add(config: DependencyConfig): void {
+  public add(config: InjectConfig): void {
     const { parent, index } = config;
 
-    const dependencies = this.get(parent);
+    const injects = this.get(parent);
 
-    dependencies[index] = config;
+    injects[index] = config;
   }
 
-  public get(token: InjectableToken): DependencyConfig[] {
+  public get(token: InjectableToken): InjectConfig[] {
     const current = this.collection.get(token);
 
     if (current) {
       return current;
     }
 
-    const dependencies: DependencyConfig[] = [];
+    const injects: InjectConfig[] = [];
 
-    this.collection.set(token, dependencies);
+    this.collection.set(token, injects);
 
-    return dependencies;
+    return injects;
   }
 }

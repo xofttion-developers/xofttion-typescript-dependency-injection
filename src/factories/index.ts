@@ -1,18 +1,25 @@
-import { DependencyConfig, InjectableConfig, InjectionConfig } from '../types';
-import { ContainerFactory } from './container';
+import { InjectConfig, InjectableConfig, InjectionConfig } from '../types';
+import { Container } from './container';
 
-const containerFactory = new ContainerFactory();
+const rootContainer = new Container();
 
-export function createInjectable(ref: InjectableConfig): void {
-  containerFactory.pushInjectable(ref);
+export function storeInjectable(ref: InjectableConfig, container?: Container): void {
+  container ? container.storeInjectable(ref) : rootContainer.storeInjectable(ref);
 }
 
-export function createInject(ref: DependencyConfig): void {
-  containerFactory.pushDependency(ref);
+export function storeInject(ref: InjectConfig, container?: Container): void {
+  container ? container.storeInject(ref) : rootContainer.storeInject(ref);
 }
 
-function factoryInjectable<T = unknown>(config: InjectionConfig<T>): T {
-  return containerFactory.createInjectable(config);
+function factoryInject<T = unknown>(
+  config: InjectionConfig<T>,
+  container?: Container
+): T {
+  return container
+    ? container.createInjectable(config)
+    : rootContainer.createInjectable(config);
 }
 
-export default factoryInjectable;
+export { Container } from './container';
+
+export default factoryInject;

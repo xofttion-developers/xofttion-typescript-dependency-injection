@@ -1,21 +1,21 @@
 import 'reflect-metadata';
 import {
   Context,
-  DependencyStore,
+  InjectStore,
   InjectableStore,
   locator,
   Scope
 } from '../stores';
 import {
   Constructable,
-  DependencyConfig,
+  InjectConfig,
   InjectableConfig,
   InjectableToken,
   InjectionConfig
 } from '../types';
 
 type DependencyProps<T> = {
-  config: DependencyConfig;
+  config: InjectConfig;
   token: InjectableToken<T>;
   context?: Context;
   scope?: Scope;
@@ -33,26 +33,26 @@ type StoreProps<T> = {
   scope: Scope;
 };
 
-const KEY = 'design:paramtypes';
+const key = 'design:paramtypes';
 
-export class ContainerFactory {
+export class Container {
   private readonly injectables: InjectableStore;
 
   private readonly scopes: Scope;
 
-  private readonly dependencies: DependencyStore;
+  private readonly dependencies: InjectStore;
 
   constructor() {
     this.injectables = new InjectableStore();
     this.scopes = new Scope();
-    this.dependencies = new DependencyStore();
+    this.dependencies = new InjectStore();
   }
 
-  public pushInjectable(config: InjectableConfig): void {
+  public storeInjectable(config: InjectableConfig): void {
     this.injectables.add(config);
   }
 
-  public pushDependency(config: DependencyConfig): void {
+  public storeInject(config: InjectConfig): void {
     this.dependencies.add(config);
   }
 
@@ -81,7 +81,7 @@ export class ContainerFactory {
 
     const dependencies = this.dependencies.get(token);
 
-    const tokens: InjectableToken[] = Reflect.getMetadata(KEY, Class);
+    const tokens: InjectableToken[] = Reflect.getMetadata(key, Class);
 
     const params = tokens?.map((token, index) => {
       if (dependencies[index]) {

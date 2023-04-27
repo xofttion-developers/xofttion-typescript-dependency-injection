@@ -1,9 +1,9 @@
-import { createInject } from '../factories';
-import { DependencyToken } from '../types';
+import { storeInject } from '../factories';
+import { InjectToken } from '../types';
 
-export function Singleton(target: DependencyToken): ParameterDecorator {
+export function Singleton(target: InjectToken): ParameterDecorator {
   return (parent, _, index) => {
-    createInject({
+    storeInject({
       target,
       index,
       parent,
@@ -13,9 +13,9 @@ export function Singleton(target: DependencyToken): ParameterDecorator {
   };
 }
 
-export function Factory(target: DependencyToken): ParameterDecorator {
+export function Factory(target: InjectToken): ParameterDecorator {
   return (parent, _, index) => {
-    createInject({
+    storeInject({
       target,
       index,
       parent,
@@ -25,9 +25,9 @@ export function Factory(target: DependencyToken): ParameterDecorator {
   };
 }
 
-export function Scope(target: DependencyToken): ParameterDecorator {
+export function Scope(target: InjectToken): ParameterDecorator {
   return (parent, _, index) => {
-    createInject({
+    storeInject({
       target,
       index,
       parent,

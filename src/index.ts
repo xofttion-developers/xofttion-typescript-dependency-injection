@@ -1,8 +1,8 @@
-import factoryInjectable from './factories';
+import factoryInject from './factories';
 
 export { Factory, Injectable, Scope, Singleton } from './decorators';
-export { createInject, createInjectable } from './factories';
+export { Container, storeInject, storeInjectable } from './factories';
 export { locator, Context } from './stores';
 export { InjectableToken, LocatorConfig } from './types';
 
-export default factoryInjectable;
+export default factoryInject;
