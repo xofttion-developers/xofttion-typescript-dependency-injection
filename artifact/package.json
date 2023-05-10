@@ -1,12 +1,12 @@
 {
   "name": "@xofttion/dependency-injection",
   "type": "commonjs",
-  "version": "4.9.12",
+  "version": "4.9.13",
   "author": "Daniel Andrés Castillo Pedroza",
   "license": "MIT",
   "main": "index.js",
   "typings": "index.d.ts",
-  "module": "xofttion-dependency-injection.esm.js",
+  "module": "index.js",
   "dependencies": {
     "reflect-metadata": "^0.1.13"
   },
