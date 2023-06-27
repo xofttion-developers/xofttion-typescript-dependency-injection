@@ -1,11 +1,5 @@
 import 'reflect-metadata';
-import {
-  Context,
-  InjectStore,
-  InjectableStore,
-  locator,
-  Scope
-} from '../stores';
+import { Context, InjectStore, InjectableStore, locator, Scope } from '../stores';
 import {
   Constructable,
   InjectConfig,
@@ -56,6 +50,14 @@ export class Container {
     this.dependencies.add(config);
   }
 
+  public printInjectables(): void {
+    console.log(this.injectables);
+  }
+
+  public printInjects(): void {
+    console.log(this.dependencies);
+  }
+
   public createInjectable<T = unknown>(config: InjectionConfig<T>): T {
     const { token: refInjectable, context } = config;
     const injectable = this.injectables.get(refInjectable);
@@ -75,15 +77,26 @@ export class Container {
   }
 
   private createObject<T = unknown>(props: InjectProps<T>): T {
-    const { token, context, scope } = props;
-
-    const Class = token as unknown as Constructable<T>;
-
-    const dependencies = this.dependencies.get(token);
+    const Class = props.token as unknown as Constructable<T>;
 
     const tokens: InjectableToken[] = Reflect.getMetadata(key, Class);
 
-    const params = tokens?.map((token, index) => {
+    const params = tokens
+      ? this.createReflectArguments(tokens, props)
+      : this.createInjectArguments(props);
+
+    return new Class(...params);
+  }
+
+  private createReflectArguments<T>(
+    tokens: InjectableToken[],
+    props: InjectProps<T>
+  ): unknown[] {
+    const { token, context, scope } = props;
+
+    const dependencies = this.dependencies.get(token);
+
+    return tokens.map((token, index) => {
       if (dependencies[index]) {
         return this.createFromDependencyConfig({
           token,
@@ -107,8 +120,22 @@ export class Container {
 
       return this.createObject({ token, context, scope });
     });
+  }
 
-    return new Class(...(params || []));
+  private createInjectArguments<T>(props: InjectProps<T>): unknown[] {
+    const { token, context, scope } = props;
+
+    const dependencies = this.dependencies.get(token);
+
+    return dependencies.reduce((injects, { target }, index) => {
+      injects[index] = this.createObject({
+        token: target,
+        scope,
+        context
+      });
+
+      return injects;
+    }, [] as unknown[]);
   }
 
   private fetchSingleton<T = unknown>({ token, context }: InjectProps<T>): T {

@@ -32,6 +32,14 @@ export function storeInject(ref: InjectConfig, container?: Container): void {
   container ? container.storeInject(ref) : rootContainer.storeInject(ref);
 }
 
+export function printInjectables(): void {
+  rootContainer.printInjectables();
+}
+
+export function printInjects(): void {
+  rootContainer.printInjects();
+}
+
 export { Container } from './container';
 
 export default factoryInject;
