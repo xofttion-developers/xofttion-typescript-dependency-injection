@@ -1,34 +1,45 @@
 import { LocatorConfig, InjectToken, InjectableToken } from '../types';
 
+type Reference = string | symbol | LocatorConfig;
+
 class LocatorStore {
-  private dependencies: Map<InjectToken, InjectableToken>;
+  private collection: Map<InjectToken, LocatorConfig>;
 
   constructor() {
-    this.dependencies = new Map();
+    this.collection = new Map();
   }
 
-  public set(dependencies: LocatorConfig[]): void {
-    dependencies.forEach(({ token, useClass }) => {
-      this.dependencies.set(token, useClass);
+  public save(dependencies: LocatorConfig[]): void {
+    dependencies.forEach((config) => {
+      this.collection.set(config.token, config);
     });
   }
 
-  public get(token: InjectToken): Undefined<InjectableToken> {
-    return this.dependencies.get(token);
-  }
-
-  public add(
-    reference: string | symbol | LocatorConfig,
-    token?: InjectableToken
-  ): void {
+  public push(reference: Reference, token?: InjectableToken): void {
     if (typeof reference !== 'string' && typeof reference !== 'symbol') {
       const { token, useClass } = reference;
 
-      this.dependencies.set(token, useClass);
+      this.collection.set(token, { token, useClass });
     } else if (token) {
-      this.dependencies.set(reference, token);
+      this.collection.set(reference, { token, useClass: token });
     }
+  }
+
+  public fetch(token: InjectToken): Undefined<LocatorConfig> {
+    return this.collection.get(token);
   }
 }
 
-export const locator = new LocatorStore();
+const locator = new LocatorStore();
+
+export function saveInLocator(dependencies: LocatorConfig[]): void {
+  locator.save(dependencies);
+}
+
+export function pushInLocator(reference: Reference, token?: InjectableToken): void {
+  locator.push(reference, token);
+}
+
+export function fetchInLocator(token: InjectToken): Undefined<LocatorConfig> {
+  return locator.fetch(token);
+}

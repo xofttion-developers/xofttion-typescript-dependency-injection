@@ -1,5 +1,11 @@
 import 'reflect-metadata';
-import { Context, InjectStore, InjectableStore, locator, Scope } from '../stores';
+import {
+  Context,
+  InjectStore,
+  InjectableStore,
+  Scope,
+  fetchInLocator
+} from '../stores';
 import {
   Constructable,
   InjectConfig,
@@ -8,14 +14,14 @@ import {
   InjectionConfig
 } from '../types';
 
-type DependencyProps<T> = {
+type InjectProps<T> = {
   config: InjectConfig;
   token: InjectableToken<T>;
   context?: Context;
   scope?: Scope;
 };
 
-type InjectProps<T> = {
+type InjectableProps<T> = {
   token: InjectableToken<T>;
   context?: Context;
   scope?: Scope;
@@ -23,8 +29,8 @@ type InjectProps<T> = {
 
 type StoreProps<T> = {
   token: InjectableToken<T>;
-  context?: Context;
   scope: Scope;
+  context?: Context;
 };
 
 const key = 'design:paramtypes';
@@ -34,20 +40,20 @@ export class Container {
 
   private readonly scopes: Scope;
 
-  private readonly dependencies: InjectStore;
+  private readonly injects: InjectStore;
 
   constructor() {
     this.injectables = new InjectableStore();
     this.scopes = new Scope();
-    this.dependencies = new InjectStore();
+    this.injects = new InjectStore();
   }
 
-  public storeInjectable(config: InjectableConfig): void {
-    this.injectables.add(config);
+  public registerInjectable(config: InjectableConfig): void {
+    this.injectables.push(config);
   }
 
-  public storeInject(config: InjectConfig): void {
-    this.dependencies.add(config);
+  public registerInject(config: InjectConfig): void {
+    this.injects.push(config);
   }
 
   public printInjectables(): void {
@@ -55,12 +61,12 @@ export class Container {
   }
 
   public printInjects(): void {
-    console.log(this.dependencies);
+    console.log(this.injects);
   }
 
   public createInjectable<T = unknown>(config: InjectionConfig<T>): T {
     const { token: refInjectable, context } = config;
-    const injectable = this.injectables.get(refInjectable);
+    const injectable = this.injectables.fetch(refInjectable);
 
     if (!injectable) {
       throw Error(
@@ -76,7 +82,7 @@ export class Container {
       : this.createObject<T>({ token, context, scope });
   }
 
-  private createObject<T = unknown>(props: InjectProps<T>): T {
+  private createObject<T = unknown>(props: InjectableProps<T>): T {
     const Class = props.token as unknown as Constructable<T>;
 
     const tokens: InjectableToken[] = Reflect.getMetadata(key, Class);
@@ -90,11 +96,11 @@ export class Container {
 
   private createReflectArguments<T>(
     tokens: InjectableToken[],
-    props: InjectProps<T>
+    props: InjectableProps<T>
   ): unknown[] {
     const { token, context, scope } = props;
 
-    const dependencies = this.dependencies.get(token);
+    const dependencies = this.injects.fetch(token);
 
     return tokens.map((token, index) => {
       if (dependencies[index]) {
@@ -106,7 +112,7 @@ export class Container {
         });
       }
 
-      const locatorToken = locator.get(token);
+      const locatorToken = fetchInLocator(token);
 
       if (locatorToken) {
         return scope
@@ -122,10 +128,10 @@ export class Container {
     });
   }
 
-  private createInjectArguments<T>(props: InjectProps<T>): unknown[] {
+  private createInjectArguments<T>(props: InjectableProps<T>): unknown[] {
     const { token, context, scope } = props;
 
-    const dependencies = this.dependencies.get(token);
+    const dependencies = this.injects.fetch(token);
 
     return dependencies.reduce((injects, { target }, index) => {
       injects[index] = this.createObject({
@@ -138,12 +144,12 @@ export class Container {
     }, [] as unknown[]);
   }
 
-  private fetchSingleton<T = unknown>({ token, context }: InjectProps<T>): T {
+  private fetchSingleton<T = unknown>({ token, context }: InjectableProps<T>): T {
     return this.fetchFromStore({ token, context, scope: this.scopes });
   }
 
   private fetchFromStore<T = unknown>({ token, scope, context }: StoreProps<T>): T {
-    const singleton = scope.get<T>(token);
+    const singleton = scope.fetch<T>(token);
 
     if (singleton) {
       return singleton;
@@ -151,22 +157,19 @@ export class Container {
 
     const object = this.createObject({ token, context, scope });
 
-    scope.add(token, object);
+    scope.push(token, object);
 
     return object;
   }
 
-  private createFromDependencyConfig<T = unknown>(
-    props: DependencyProps<T>
-  ): unknown {
+  private createFromDependencyConfig<T = unknown>(props: InjectProps<T>): unknown {
     const {
       context,
-      token,
       scope,
       config: { scopeable, singleton, target }
     } = props;
 
-    const locatorToken = locator.get(target);
+    const locatorToken = fetchInLocator(target);
 
     if (locatorToken && singleton) {
       return this.fetchSingleton({ token: locatorToken, context });
@@ -180,6 +183,6 @@ export class Container {
       });
     }
 
-    return this.createObject({ token, context });
+    return this.createObject({ token: target, context });
   }
 }

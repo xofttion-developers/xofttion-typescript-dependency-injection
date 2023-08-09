@@ -8,6 +8,7 @@ export type InjectableToken<T = unknown> =
   | Constructable<T>;
 
 export type InjectableConfig = {
+  scopeable: boolean;
   singleton: boolean;
   target: InjectableToken;
 };

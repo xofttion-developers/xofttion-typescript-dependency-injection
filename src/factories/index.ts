@@ -6,30 +6,42 @@ import {
 } from '../types';
 import { Container } from './container';
 
+interface Injection<T> {
+  config: InjectionConfig<T>;
+  container?: Container;
+}
+
+interface Token<T> {
+  token: InjectableToken<T>;
+  container?: Container;
+}
+
+interface Injectable {
+  config: InjectableConfig;
+  container?: Container;
+}
+
+interface Inject {
+  config: InjectConfig;
+  container?: Container;
+}
+
 const rootContainer = new Container();
 
-function factoryInject<T = unknown>(
-  config: InjectionConfig<T>,
-  container?: Container
-): T {
-  return container
-    ? container.createInjectable(config)
-    : rootContainer.createInjectable(config);
+function factoryInject<T = unknown>({ config, container }: Injection<T>): T {
+  return (container || rootContainer).createInjectable(config);
 }
 
-export function inject<T = unknown>(
-  token: InjectableToken<T>,
-  container?: Container
-): T {
-  return factoryInject({ token }, container);
+export function inject<T = unknown>({ token, container }: Token<T>): T {
+  return factoryInject({ config: { token }, container });
 }
 
-export function storeInjectable(ref: InjectableConfig, container?: Container): void {
-  container ? container.storeInjectable(ref) : rootContainer.storeInjectable(ref);
+export function registerInjectable({ config, container }: Injectable): void {
+  (container || rootContainer).registerInjectable(config);
 }
 
-export function storeInject(ref: InjectConfig, container?: Container): void {
-  container ? container.storeInject(ref) : rootContainer.storeInject(ref);
+export function registerInject({ config, container }: Inject): void {
+  (container || rootContainer).registerInject(config);
 }
 
 export function printInjectables(): void {
