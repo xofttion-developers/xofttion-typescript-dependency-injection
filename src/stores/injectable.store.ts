@@ -1,5 +1,7 @@
 import { InjectableConfig, InjectableToken } from '../types';
 
+type Config<T> = Undefined<InjectableConfig<T>>;
+
 export class InjectableStore {
   private collection: Map<InjectableToken, InjectableConfig> = new Map();
 
@@ -7,7 +9,7 @@ export class InjectableStore {
     this.collection.set(config.target, config);
   }
 
-  public fetch(token: InjectableToken): Undefined<InjectableConfig> {
+  public fetch<T = unknown>(token: InjectableToken<T>): Config<T> {
     return this.collection.get(token);
   }
 }

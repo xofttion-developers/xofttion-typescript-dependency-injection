@@ -7,13 +7,13 @@ export type InjectableToken<T = unknown> =
   | CallableFunction
   | Constructable<T>;
 
-export type InjectableConfig = {
+export interface InjectableConfig<T = unknown> {
   scopeable: boolean;
   singleton: boolean;
-  target: InjectableToken;
-};
+  target: InjectableToken<T>;
+}
 
-export type InjectionConfig<T> = {
+export interface InjectionConfig<T> {
   token: InjectableToken<T>;
   context?: Context;
-};
+}

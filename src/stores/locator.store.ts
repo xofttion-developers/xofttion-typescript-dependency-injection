@@ -25,7 +25,7 @@ class LocatorStore {
     }
   }
 
-  public fetch(token: InjectToken): Undefined<LocatorConfig> {
+  public fetch<T = unknown>(token: InjectToken<T>): Undefined<LocatorConfig<T>> {
     return this.collection.get(token);
   }
 }
@@ -40,6 +40,8 @@ export function pushInLocator(reference: Reference, token?: InjectableToken): vo
   locator.push(reference, token);
 }
 
-export function fetchInLocator(token: InjectToken): Undefined<LocatorConfig> {
+export function fetchInLocator<T = unknown>(
+  token: InjectToken<T>
+): Undefined<LocatorConfig<T>> {
   return locator.fetch(token);
 }

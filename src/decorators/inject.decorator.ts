@@ -1,44 +1,28 @@
 import { registerInject } from '../factories';
 import { InjectToken } from '../types';
 
-export function Singleton(target: InjectToken): ParameterDecorator {
+interface Inject {
+  token: InjectToken;
+  scopeable: boolean;
+  singleton: boolean;
+}
+
+function createInject({ scopeable, singleton, token }: Inject): ParameterDecorator {
   return (parent, _, index) => {
     registerInject({
-      config: {
-        target,
-        index,
-        parent,
-        scopeable: false,
-        singleton: true
-      }
+      config: { index, parent, scopeable, singleton, token }
     });
   };
 }
 
-export function Factory(target: InjectToken): ParameterDecorator {
-  return (parent, _, index) => {
-    registerInject({
-      config: {
-        target,
-        index,
-        parent,
-        scopeable: false,
-        singleton: false
-      }
-    });
-  };
+export function Singleton(token: InjectToken): ParameterDecorator {
+  return createInject({ token, scopeable: false, singleton: true });
 }
 
-export function Scope(target: InjectToken): ParameterDecorator {
-  return (parent, _, index) => {
-    registerInject({
-      config: {
-        target,
-        index,
-        parent,
-        scopeable: true,
-        singleton: false
-      }
-    });
-  };
+export function Scope(token: InjectToken): ParameterDecorator {
+  return createInject({ token, scopeable: true, singleton: false });
+}
+
+export function Factory(token: InjectToken): ParameterDecorator {
+  return createInject({ token, scopeable: false, singleton: false });
 }

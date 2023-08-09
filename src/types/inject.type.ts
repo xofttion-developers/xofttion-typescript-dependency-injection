@@ -1,13 +1,11 @@
 import { InjectableToken } from './injectable.type';
 
-export type InjectToken = InjectableToken | string | symbol;
+export type InjectToken<T = unknown> = InjectableToken<T> | string | symbol;
 
-export type InjectConfig = {
-  target: InjectToken;
+export type InjectConfig<T = unknown> = {
   index: number;
   parent: InjectableToken;
   scopeable: boolean;
   singleton: boolean;
+  token: InjectToken<T>;
 };
-
-export type InjectKey<T = unknown> = InjectableToken<T> | string | symbol;
