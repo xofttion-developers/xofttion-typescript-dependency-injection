@@ -10,7 +10,7 @@ export type InjectableToken<T = unknown> =
 export interface InjectableConfig<T = unknown> {
   scopeable: boolean;
   singleton: boolean;
-  target: InjectableToken<T>;
+  token: InjectableToken<T>;
 }
 
 export interface InjectionConfig<T> {

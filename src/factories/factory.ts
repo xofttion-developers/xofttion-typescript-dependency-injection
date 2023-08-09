@@ -16,7 +16,7 @@ import {
 
 type Tokens = Undefined<InjectableToken[]>;
 
-interface InjectableObjectProps {
+interface InjectableProps {
   container: Container;
   context?: Context;
 }
@@ -38,14 +38,14 @@ interface ReflectProps<T> {
   tokens: InjectableToken[];
 }
 
-class InjectableObject {
-  private scope: ScopeStore;
-
+class Injectable {
   private container: Container;
+
+  private scope: ScopeStore;
 
   private context?: Context;
 
-  constructor({ container, context }: InjectableObjectProps) {
+  constructor({ container, context }: InjectableProps) {
     this.container = container;
     this.context = context;
 
@@ -59,9 +59,9 @@ class InjectableObject {
       throw Error(`Class ${injectable.toString()} is not found in the collection`);
     }
 
-    const { scopeable, singleton, target } = config;
+    const { scopeable, singleton, token } = config;
 
-    return this.createInstance({ token: target, scopeable, singleton });
+    return this.createInstance({ token, scopeable, singleton });
   }
 
   private createObject<T = unknown>(token: InjectableToken<T>): T {
@@ -210,7 +210,7 @@ export class Builder {
     const { token, context } = config;
     const { container } = this;
 
-    const injectable = new InjectableObject({ container, context });
+    const injectable = new Injectable({ container, context });
 
     return injectable.build(token);
   }

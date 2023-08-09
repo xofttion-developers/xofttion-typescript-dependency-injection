@@ -14,7 +14,7 @@ export function Injectable(config?: Partial<InjectableConfig>): ClassDecorator {
   const finalConfig = { ...defaultConfig, ...config };
   const { scopeable, singleton } = finalConfig;
 
-  return (target) => {
-    registerInjectable({ config: { scopeable, singleton, target } });
+  return (token) => {
+    registerInjectable({ config: { scopeable, singleton, token } });
   };
 }
