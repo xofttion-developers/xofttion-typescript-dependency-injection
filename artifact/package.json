@@ -1,7 +1,7 @@
 {
   "name": "@xofttion/dependency-injection",
   "type": "commonjs",
-  "version": "4.9.20",
+  "version": "4.9.21",
   "author": "Daniel Andrés Castillo Pedroza",
   "license": "MIT",
   "main": "index.js",

@@ -12,10 +12,6 @@ export class ScopeStore {
   }
 
   public fetch<T = unknown>(token: InjectableToken): T {
-    if (!this.collection.has(token)) {
-      throw Error(`Class ${token.toString()} is not found in the scope`);
-    }
-
     return this.collection.get(token) as T;
   }
 }
